@@ -1,0 +1,87 @@
+[common]
+primary = True            # Set to False if you use several wfb instances on one card. Only primary instance will set radio channel.
+log_file = "wfb-ng/wfb-ng.log" # Set to None (without quotes) for stdout
+link_id = "default"       # It will be hashed and mapped to three bytes of MAC
+                          # You can use different link ids for multi-vehicle setup without stream remapping.
+                          # For that case need to have several instances of wifibroadcast.cfg on GS - one for each link (GS <-> droneX)
+                          # Redefine peer addresses, tunnel interfaces and tunnel addresses to not overlap
+                          # Copy and rename wifibroadcast@.gs service and set path to custom wfb config.
+
+set_nm_unmanaged = True   # Set radio interface in 'unmanaged state' in NetworkManager
+radio_mtu = 1445          # MAX_PAYLOAD_SIZE, don't change if doubt
+tunnel_agg_timeout= 0.005 # aggragate tuntap packets if less than radio_mtu but no longer than 5ms
+mavlink_agg_timeout = 0.1 # aggragate mavlink packets if less than radio_mtu but no longer than 100ms
+mavlink_err_rate = True   # If true then inject RX error rate else absolute values
+tx_sel_delta = 3          # hysteresis for antenna selection, [dB]
+wifi_channel = 161  # 161 -- radio channel @5825 MHz, range: 5815–5835 MHz, width 20MHz
+                    # 1 -- radio channel @2412 Mhz, 
+                    # see https://en.wikipedia.org/wiki/List_of_WLAN_channels for reference
+wifi_region = 'BO'  # Your country for CRDA (use BO or GY if you want max tx power)  
+wifi_txpower = None # Doesn't affect 8812au drivers, use module parameter instead
+
+[drone_mavlink]
+keypair = '/etc/wfb-ng/drone.key'
+stats_port = None
+stream_tx = 0x10
+stream_rx = 0x90
+port_rx = 14700
+port_tx = 14701
+
+peer = 'listen://0.0.0.0:14560'   # incoming connection
+#peer = 'connect://127.0.0.1:14560'  # outgoing connection
+mirror = None
+
+inject_rssi = True    # inject RADIO_STATUS packets
+mavlink_sys_id = 3    # for injected rssi packets
+mavlink_comp_id = 68  # MAV_COMP_ID_TELEMETRY_RADIO
+
+# Radio settings for TX and RX
+bandwidth = 20     # bandwidth 20 or 40 MHz
+
+# Radiotap flags for TX:
+short_gi = False   # use short GI or not
+stbc = 1           # stbc streams: 1, 2, 3 or 0 if unused
+ldpc = 1           # use LDPC FEC. Currently available only for 8812au and must be supported both on TX and RX.
+mcs_index = 1      # mcs index
+
+call_on_arm = None    # call program on arm
+call_on_disarm = None # call program on disarm
+mavlink_tcp_port = 5760 # listen for connections from QGC or from onboard computer
+
+
+[drone_video]
+keypair = '/etc/wfb-ng/drone.key'
+stats_port = None
+stream = 0x0
+
+peer = 'listen://0.0.0.0:5602'  # listen for video stream (drone)
+
+# Radio settings for TX and RX
+bandwidth = 20     # bandwidth 20 or 40 MHz
+
+# Radiotap flags for TX:
+short_gi = False   # use short GI or not
+stbc = 1           # stbc streams: 1, 2, 3 or 0 if unused
+ldpc = 1           # use LDPC FEC. Currently available only for 8812au and must be supported both on TX and RX.
+mcs_index = 1      # mcs index
+
+
+[drone_tunnel]
+keypair = '/etc/wfb-ng/drone.key'
+stats_port = None
+stream_tx = 0xa0
+stream_rx = 0x20
+port_rx = 14900
+port_tx = 14901
+
+# ifname = 'drone-wfb'
+# ifaddr = '10.5.0.2/24'
+
+# Radio settings for TX and RX
+bandwidth = 20     # bandwidth 20 or 40 MHz
+
+# Radiotap flags for TX:
+short_gi = False   # use short GI or not
+stbc = 1           # stbc streams: 1, 2, 3 or 0 if unused
+ldpc = 1           # use LDPC FEC. Currently available only for 8812au and must be supported both on TX and RX.
+mcs_index = 1      # mcs index

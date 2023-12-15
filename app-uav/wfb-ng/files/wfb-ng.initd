@@ -1,0 +1,28 @@
+#!/sbin/openrc-run
+# Copyright 1999-2021 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+INSTANCE="${SVCNAME#*.}"
+: ${WFB_IFACE:=wfb-wlan1}
+: ${WFB_RETRY:=100}
+: ${WFB_CFG:=/etc/wfb-ng/${INSTANCE}.cfg}
+
+depend() {
+    need localmount
+    use net
+}
+
+command="/usr/bin/wfb-server"
+name="wfb-ng ${INSTANCE}"
+command_args="${INSTANCE} ${WFB_IFACE}"
+pidfile="/run/${SVCNAME}.pid"
+supervisor=supervise-daemon
+
+retry="${WFB_RETRY}"
+start_stop_daemon_args="
+    --env WIFIBROADCAST_CFG=${WFB_CFG}
+    --stdout /var/log/wfb-ng/stdout
+    --stderr /var/log/wfb-ng/stderr
+"
+#	--make-pidfile
+required_files="${WFB_CFG}"

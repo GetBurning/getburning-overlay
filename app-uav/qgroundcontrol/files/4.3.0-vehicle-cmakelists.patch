@@ -1,0 +1,31 @@
+--- a/src/Vehicle/CMakeLists.txt  2023-12-14 13:10:08.050830016 +0300
++++ b/src/Vehicle/CMakeLists.txt  2023-12-14 13:10:08.270517161 +0300
+@@ -73,6 +73,8 @@
+ 	VehicleClockFactGroup.h
+ 	VehicleDistanceSensorFactGroup.cc
+ 	VehicleDistanceSensorFactGroup.h
++	VehicleEFIFactGroup.cc
++	VehicleEFIFactGroup.h
+ 	VehicleEscStatusFactGroup.cc
+ 	VehicleEscStatusFactGroup.h
+ 	VehicleEstimatorStatusFactGroup.cc
+@@ -85,6 +87,8 @@
+ 	VehicleGPSFactGroup.h
+ 	VehicleGPS2FactGroup.cc
+ 	VehicleGPS2FactGroup.h
++	VehicleGeneratorFactGroup.cc
++	VehicleGeneratorFactGroup.h
+ 	Vehicle.h
+ 	VehicleLinkManager.cc
+ 	VehicleLinkManager.h
+@@ -98,8 +102,8 @@
+ 	VehicleVibrationFactGroup.h
+ 	VehicleWindFactGroup.cc
+ 	VehicleWindFactGroup.h
+-        VehicleHygrometerFactGroup.cc
+-        VehicleHygrometerFactGroup.h
++	VehicleHygrometerFactGroup.cc
++	VehicleHygrometerFactGroup.h
+ 	RemoteIDManager.h
+ 	RemoteIDManager.cc
+ 

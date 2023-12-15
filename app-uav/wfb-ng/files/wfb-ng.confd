@@ -1,0 +1,4 @@
+# Example configuration file for wfb-ng instance
+# WFB_IFACE="wfb-wlan1"
+# WFB_CFG="/path/to/file"
+# WFB_RETRY=""
