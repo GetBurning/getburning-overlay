@@ -1,0 +1,15 @@
+This is my new Portage tree overlay.
+
+You can add it with =eselect repository=:
+#+begin_src sh
+eselect repository add getburning git https://github.com/GetBurning/getburning-overlay
+#+end_src
+Or with a configuration file in =/etc/portage/repos.conf/=:
+#+NAME: getburning.conf
+#+begin_src conf
+[getburning]
+location = /var/db/repos/getburning
+sync-type = git
+sync-uri = https://github.com/GetBurning/getburning-overlay
+#+end_src
+Or just copy things to your own overlay.
