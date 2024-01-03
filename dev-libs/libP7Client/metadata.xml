@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>getburning@bakka.su</email>
+    <description>In getburning overlay.</description>
+  </maintainer>
+  <use>
+    <flag name="shared">Install shared library and headers</flag>
+  </use>
+</pkgmetadata>
