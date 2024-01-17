@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>getburning@bakka.su</email>
+    <description>In getburning overlay.</description>
+  </maintainer>
+  <upstream>
+	<remote-id type="github">prusa3d/libbgcode</remote-id>
+  </upstream>
+</pkgmetadata>
