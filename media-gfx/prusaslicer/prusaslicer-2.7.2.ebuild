@@ -15,10 +15,10 @@ SRC_URI="https://github.com/prusa3d/PrusaSlicer/archive/refs/tags/version_${MY_P
 
 LICENSE="AGPL-3 Boost-1.0 GPL-2 LGPL-3 MIT"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE="test"
 
-RESTRICT="test mirror"
+RESTRICT="test"
 
 RDEPEND="
 	dev-cpp/eigen:3
@@ -30,6 +30,7 @@ RDEPEND="
 	dev-libs/gmp:=
 	dev-libs/mpfr:=
 	media-gfx/openvdb:=
+	media-libs/libbgcode
 	net-misc/curl[adns]
 	media-libs/glew:0=
 	media-libs/libjpeg-turbo:=
@@ -45,15 +46,14 @@ RDEPEND="
 	x11-libs/gtk+:3
 	>=x11-libs/wxGTK-3.2.2.1-r3:${WX_GTK_VER}[X,opengl]
 	media-libs/nanosvg:=
-	media-libs/libbgcode
 "
 DEPEND="${RDEPEND}
 	media-libs/qhull[static-libs]
 "
 
 PATCHES=(
-	"${FILESDIR}/${P}-libexpat-double-definition-fix.patch"
-	"${FILESDIR}/${P}-dont-force-link-to-wayland-and-x11.patch"
+	"${FILESDIR}/${PN}-2.7.1-libexpat-double-definition-fix.patch"
+	"${FILESDIR}/${PN}-2.7.1-dont-force-link-to-wayland-and-x11.patch"
 )
 
 S="${WORKDIR}/${MY_PN}-version_${MY_PV}"
