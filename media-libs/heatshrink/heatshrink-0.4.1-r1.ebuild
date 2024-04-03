@@ -19,6 +19,7 @@ fi
 
 LICENSE="ISC"
 SLOT="0"
+DEPENDS="!dev-libs/heatshrink"
 
 src_prepare() {
 	cp "${FILESDIR}/"{CMakeLists.txt,Config.cmake.in} "${S}/" || die
