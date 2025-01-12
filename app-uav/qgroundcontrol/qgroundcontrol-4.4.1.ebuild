@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Gentoo Authors
+# Copyright 2022-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -51,6 +51,7 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 
 src_prepare() {
+	# eapply "${FILESDIR}/4.3.0-vehicle-cmakelists.patch"
 	sed -i -e 's|libs/eigen|/usr/include/eigen3|g' \
 		-e 's|libs/shapelib|/usr/include/libshp|g' \
 		CMakeLists.txt || die
@@ -62,7 +63,7 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=("-DOpenGL_GL_PREFERENCE=GLVND"
-					   # BUILD_SHARED_LIBS=ON produces strong gdependency cycle
+					   # BUILD_SHARED_LIBS=ON produces strong dependency cycle
 					   "-DBUILD_SHARED_LIBS=OFF")
 	cmake_src_configure
 }
