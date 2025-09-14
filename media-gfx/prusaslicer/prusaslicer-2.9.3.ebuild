@@ -25,7 +25,7 @@ LICENSE="AGPL-3 Boost-1.0 GPL-2 LGPL-3 MIT"
 SLOT="0"
 IUSE="test"
 
-RESTRICT="!test? ( test )"
+RESTRICT="!test? ( test ) mirror"
 
 RDEPEND="
 	dev-cpp/eigen:3
