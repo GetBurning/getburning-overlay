@@ -29,7 +29,7 @@ fi
 
 SLOT="0"
 
-IUSE="test"
+IUSE="test debug"
 
 RESTRICT="test mirror"
 
@@ -102,6 +102,10 @@ src_configure() {
 		-DSLIC3R_WX_STABLE=OFF
 		-Wno-dev
 	)
+	use debug && mycmakeargs+=(
+			-DCMAKE_BUILD_TYPE=RelWithDebInfo
+			-DORCA_INCLUDE_DEBUG_INFO=ON
+		)
 
 	cmake_src_configure
 }
