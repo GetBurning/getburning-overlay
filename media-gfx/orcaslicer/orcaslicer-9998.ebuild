@@ -43,7 +43,7 @@ RDEPEND="
 	dev-libs/gmp:=
 	dev-libs/mpfr:=
 	media-gfx/openvdb:=
-	media-libs/libbgcode
+	media-gfx/libbgcode
 	net-misc/curl[adns]
 	media-libs/glfw
 	media-libs/glew:0=
