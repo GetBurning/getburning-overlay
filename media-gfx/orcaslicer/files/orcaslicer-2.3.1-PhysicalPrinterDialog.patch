@@ -1,0 +1,13 @@
+--- a/src/slic3r/GUI/PhysicalPrinterDialog.cpp	2025-03-18 18:26:46.000000000 +0300
++++ b/src/slic3r/GUI/PhysicalPrinterDialog.cpp	2025-09-14 15:12:19.412959440 +0300
+@@ -374,7 +374,9 @@
+     // Always fill in the "printhost_port" combo box from the config and select it.
+     {
+         Choice* choice = dynamic_cast<Choice*>(m_optgroup->get_field("printhost_port"));
+-        choice->set_values({ m_config->opt_string("printhost_port") });
++        wxArrayString ports;
++        ports.Add(m_config->opt_string("printhost_port"));
++        choice->set_values(ports);
+         choice->set_selection();
+     }
+ 

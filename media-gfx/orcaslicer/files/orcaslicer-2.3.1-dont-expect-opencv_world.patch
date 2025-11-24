@@ -1,0 +1,28 @@
+--- a/src/libslic3r/CMakeLists.txt
++++ b/src/libslic3r/CMakeLists.txt
+@@ -572,7 +569,9 @@ target_link_libraries(libslic3r
+         libigl
+         libnest2d
+         miniz
+-        opencv_world
++        opencv_core
++        opencv_imgcodecs
++        opencv_imgproc
+     PRIVATE
+         ${CMAKE_DL_LIBS}
+         ${EXPAT_LIBRARIES}
+--- a/deps/OpenCV/OpenCV.cmake
++++ b/deps/OpenCV/OpenCV.cmake
+@@ -67,10 +67,10 @@ orcaslicer_add_cmake_project(OpenCV
+        -DWITH_INF_ENGINE=OFF
+        -DWITH_NGRAPH=OFF
+        -DBUILD_WITH_STATIC_CRT=OFF#set /MDd /MD
+-       -DBUILD_LIST=core,imgcodecs,imgproc,world
++       -DBUILD_LIST=core,imgcodecs,imgproc
+        -DBUILD_opencv_highgui=OFF
+        -DWITH_ADE=OFF
+-       -DBUILD_opencv_world=ON
++       -DBUILD_opencv_world=OFF
+        -DWITH_PROTOBUF=OFF
+        -DWITH_WIN32UI=OFF
+        -DHAVE_WIN32UI=FALSE
