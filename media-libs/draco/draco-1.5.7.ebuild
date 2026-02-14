@@ -14,7 +14,7 @@ if [[ "${PV}" == "9999" ]]; then
 else
 	inherit verify-sig
 	SRC_URI="https://github.com/google/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~x86"
+	KEYWORDS="~amd64 ~x86 ~arm64"
 fi
 
 LICENSE="Apache-2.0"

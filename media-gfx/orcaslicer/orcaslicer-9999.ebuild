@@ -16,7 +16,7 @@ LICENSE="AGPL-3 Boost-1.0 GPL-2 LGPL-3 MIT"
 if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/SoftFever/OrcaSlicer.git"
-	S="${WORKDIR}/${PN}-${PV}"
+	S="${WORKDIR}/${P}"
 elif [[ ${PV} == *9998* ]]; then
 	MY_REF="f57d0d1442bfb065c9162d773c774b8835757a5e"
 	SRC_URI="https://github.com/SoftFever/OrcaSlicer/archive/${MY_REF}.tar.gz -> ${PN}-${MY_REF}.tar.gz"
@@ -24,7 +24,7 @@ elif [[ ${PV} == *9998* ]]; then
 else
 	SRC_URI="https://github.com/SoftFever/OrcaSlicer/archive/refs/tags/v${MY_PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm64 ~x86"
-	S="${WORKDIR}/${MY_PN}-${PV}"
+	S="${WORKDIR}/${MY_PN}-${MY_PV}"
 fi
 
 SLOT="0"
@@ -55,7 +55,7 @@ RDEPEND="
 	sci-libs/opencascade:=
 	sci-mathematics/cgal:=
 	sys-apps/dbus
-	sys-libs/zlib:=
+	virtual/zlib:=
 	virtual/opengl
 	x11-libs/gtk+:3
 	>=x11-libs/wxGTK-3.2.2.1-r3:${WX_GTK_VER}[X,opengl]

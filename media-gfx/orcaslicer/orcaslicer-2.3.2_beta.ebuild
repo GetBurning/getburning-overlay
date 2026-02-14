@@ -15,7 +15,7 @@ LICENSE="AGPL-3 Boost-1.0 GPL-2 LGPL-3 MIT"
 
 if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
-	EGIT_REPO_URI="https://github.com/prusa3d/prusaslicer.git"
+	EGIT_REPO_URI="https://github.com/SoftFever/OrcaSlicer.git"
 	S="${WORKDIR}/${P}"
 elif [[ ${PV} == *9998* ]]; then
 	MY_REF="f57d0d1442bfb065c9162d773c774b8835757a5e"
@@ -24,7 +24,7 @@ elif [[ ${PV} == *9998* ]]; then
 else
 	SRC_URI="https://github.com/SoftFever/OrcaSlicer/archive/refs/tags/v${MY_PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm64 ~x86"
-	S="${WORKDIR}/${MY_PN}-${PV}"
+	S="${WORKDIR}/${MY_PN}-${MY_PV}"
 fi
 
 SLOT="0"
@@ -62,6 +62,7 @@ RDEPEND="
 	media-libs/nanosvg:=
 	media-libs/opencv
 	media-libs/libnoise
+	media-libs/draco
 "
 DEPEND="${RDEPEND}
 	media-libs/qhull[static-libs]
@@ -108,4 +109,15 @@ src_configure() {
 		)
 
 	cmake_src_configure
+}
+
+src_install() {
+	cmake_src_install
+	for p in "usr/LICENSE.txt" \
+			 "usr/include/stb_dxt/stb_dxt.h" \
+			 "usr/lib/cmake/stb_dxt/stb_dxtTargets.cmake"; do
+		rm "${D}/${p}" || die "Upstream fixed this, remove me"
+	done
+
+	dodoc README.md
 }
