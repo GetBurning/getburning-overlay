@@ -1,0 +1,13 @@
+BDEPEND=app-alternatives/ninja >=dev-build/cmake-3.28.5 verify-sig? ( || ( app-alternatives/gpg app-crypt/gnupg[-alternatives(-)] ) >=app-portage/gemato-20 )
+DEFINED_PHASES=compile configure install prepare test unpack
+DESCRIPTION=A library for compressing and decompressing 3D geometric meshes and point clouds
+EAPI=8
+HOMEPAGE=https://github.com/google/draco
+INHERIT=cmake verify-sig
+IUSE=verify-sig
+KEYWORDS=~amd64 ~x86
+LICENSE=Apache-2.0
+SLOT=0
+SRC_URI=https://github.com/google/draco/archive/refs/tags/1.5.7.tar.gz -> draco-1.5.7.tar.gz
+_eclasses_=toolchain-funcs	7e440a20ac11dece04e3334622e6e5da	flag-o-matic	ed1eda86c8f746a2a75f7f9f7478f5f4	multiprocessing	1e32df7deee68372153dca65f4a7c21f	ninja-utils	3a59a39e97af0f7c03f49cf3c22f262b	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	cmake	5691a3da96eac88f135cf3596b8c2c3c	eapi9-pipestatus	d2c134036ac31c3085aebc9147f572bd	verify-sig	ece4c893b6bd62eacbc4d25958e857f8
+_md5_=2e6033f984eb4f2fd3e05edf4aa012eb
