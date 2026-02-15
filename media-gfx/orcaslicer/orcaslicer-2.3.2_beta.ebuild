@@ -89,9 +89,6 @@ src_configure() {
 
 	setup-wxwidgets
 
-	# src/libslic3r/ObjColorUtils.hpp includes "opencv2/opencv.hpp" without using CMake find_module
-	export CPLUS_INCLUDE_PATH="/usr/include/opencv4/"
-
 	local mycmakeargs=(
 		-DOPENVDB_FIND_MODULE_PATH="/usr/$(get_libdir)/cmake/OpenVDB"
 		-DSLIC3R_BUILD_TESTS=$(usex test)
