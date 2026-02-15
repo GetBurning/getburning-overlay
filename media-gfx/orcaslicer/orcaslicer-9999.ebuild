@@ -58,7 +58,7 @@ RDEPEND="
 	virtual/zlib:=
 	virtual/opengl
 	x11-libs/gtk+:3
-	>=x11-libs/wxGTK-3.2.2.1-r3:${WX_GTK_VER}[X,opengl]
+	>=x11-libs/wxGTK-3.2.2.1-r3:${WX_GTK_VER}[X,opengl,keyring]
 	media-libs/nanosvg:=
 	media-libs/opencv
 	media-libs/libnoise
