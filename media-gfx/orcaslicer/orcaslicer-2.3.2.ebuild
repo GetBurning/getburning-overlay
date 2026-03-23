@@ -15,7 +15,7 @@ LICENSE="AGPL-3 Boost-1.0 GPL-2 LGPL-3 MIT"
 
 if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
-	EGIT_REPO_URI="https://github.com/prusa3d/prusaslicer.git"
+	EGIT_REPO_URI="https://github.com/SoftFever/OrcaSlicer.git"
 	S="${WORKDIR}/${P}"
 elif [[ ${PV} == *9998* ]]; then
 	MY_REF="f57d0d1442bfb065c9162d773c774b8835757a5e"
@@ -24,7 +24,7 @@ elif [[ ${PV} == *9998* ]]; then
 else
 	SRC_URI="https://github.com/SoftFever/OrcaSlicer/archive/refs/tags/v${MY_PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm64 ~x86"
-	S="${WORKDIR}/${MY_PN}-${PV}"
+	S="${WORKDIR}/${MY_PN}-${MY_PV}"
 fi
 
 SLOT="0"
@@ -58,10 +58,11 @@ RDEPEND="
 	virtual/zlib:=
 	virtual/opengl
 	x11-libs/gtk+:3
-	>=x11-libs/wxGTK-3.2.2.1-r3:${WX_GTK_VER}[X,opengl]
+	>=x11-libs/wxGTK-3.2.2.1-r3:${WX_GTK_VER}[X,opengl,keyring]
 	media-libs/nanosvg:=
 	media-libs/opencv
 	media-libs/libnoise
+	media-libs/draco
 "
 DEPEND="${RDEPEND}
 	media-libs/qhull[static-libs]
@@ -73,8 +74,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-2.3.1-opencascade-7.8.0.patch"
 	"${FILESDIR}/${PN}-2.3.1-dont-expect-opencv_world.patch"
 	"${FILESDIR}/${PN}-2.3.1-PhysicalPrinterDialog.patch"
-	"${FILESDIR}/${PN}-2.3.1-fix-linking-to-webkitgtk.patch"
-
+	"${FILESDIR}/${PN}-2.3.2-fix-linking-to-webkitgtk.patch"
 )
 
 src_prepare() {
@@ -87,9 +87,6 @@ src_configure() {
 	CMAKE_BUILD_TYPE="Release"
 
 	setup-wxwidgets
-
-	# src/libslic3r/ObjColorUtils.hpp includes "opencv2/opencv.hpp" without using CMake find_module
-	export CPLUS_INCLUDE_PATH="/usr/include/opencv4/"
 
 	local mycmakeargs=(
 		-DOPENVDB_FIND_MODULE_PATH="/usr/$(get_libdir)/cmake/OpenVDB"
@@ -108,4 +105,15 @@ src_configure() {
 		)
 
 	cmake_src_configure
+}
+
+src_install() {
+	cmake_src_install
+	for p in "usr/LICENSE.txt" \
+			 "usr/include/stb_dxt/stb_dxt.h" \
+			 "usr/lib/cmake/stb_dxt/stb_dxtTargets.cmake"; do
+		rm "${D}/${p}" || die "Upstream fixed this, remove me"
+	done
+
+	dodoc README.md
 }
