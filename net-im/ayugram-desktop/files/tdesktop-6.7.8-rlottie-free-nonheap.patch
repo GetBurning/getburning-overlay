@@ -1,0 +1,14 @@
+Remove compiler warning about deleting reference to a static object.
+--- a/Telegram/ThirdParty/rlottie/src/vector/vcowptr.h	2026-04-28 14:15:57.478669822 +0300
++++ b/Telegram/ThirdParty/rlottie/src/vector/vcowptr.h	2026-04-29 08:30:15.954316770 +0300
+@@ -42,9 +42,7 @@
+ 
+     vcow_ptr()
+     {
+-        static model default_s;
+-        mModel = &default_s;
+-        ++mModel->mRef;
++        mModel = new model();
+     }
+ 
+     ~vcow_ptr()

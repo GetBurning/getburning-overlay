@@ -125,6 +125,8 @@ PATCHES=(
 	"${FILESDIR}"/tdesktop-5.7.2-cstring.patch
 	"${FILESDIR}"/tdesktop-5.8.3-cstdint.patch
 	"${FILESDIR}"/tdesktop-5.14.3-system-cppgir.patch
+	"${FILESDIR}"/tdesktop-6.7.8-rlottie-free-nonheap.patch
+	"${FILESDIR}"/lib_base--minizip-unzip-include-path.patch
 )
 
 pkg_pretend() {
