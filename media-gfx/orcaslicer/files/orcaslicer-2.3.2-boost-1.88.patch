@@ -1,3 +1,5 @@
+diff --git a/src/libslic3r/GCode/PostProcessor.cpp b/src/libslic3r/GCode/PostProcessor.cpp
+index 1e084cd35e..73c69b002d 100644
 --- a/src/libslic3r/GCode/PostProcessor.cpp
 +++ b/src/libslic3r/GCode/PostProcessor.cpp
 @@ -149,7 +149,14 @@ static int run_script(const std::string &script, const std::string &gcode, std::
@@ -15,85 +17,8 @@
  
  namespace process = boost::process;
  
---- a/src/slic3r/GUI/MediaPlayCtrl.cpp
-+++ b/src/slic3r/GUI/MediaPlayCtrl.cpp
-@@ -13,7 +13,17 @@
- #include <boost/nowide/cstdio.hpp>
- #include <boost/nowide/utf8_codecvt.hpp>
- #undef pid_t
-+#if BOOST_VERSION >= 108800 // v2 is now default
-+#define BOOST_PROCESS_VERSION 1
-+#include <boost/process/v1/child.hpp>
-+#include <boost/process/v1/io.hpp>
-+#include <boost/process/v1/pipe.hpp>
-+#include <boost/process/v1/search_path.hpp>
-+#include <boost/process/v1/start_dir.hpp>
-+#include <boost/process/v1/handles.hpp>
-+#else
- #include <boost/process.hpp>
-+#endif
- #ifdef __WIN32__
- #include <boost/process/windows.hpp>
- #else
---- a/src/slic3r/GUI/RemovableDriveManager.cpp
-+++ b/src/slic3r/GUI/RemovableDriveManager.cpp
-@@ -22,8 +22,16 @@
- #include <pwd.h>
- #include <boost/filesystem.hpp>
- #include <boost/system/error_code.hpp>
-+#if BOOST_VERSION >= 108800 // v2 is now default
-+#define BOOST_PROCESS_VERSION 1
-+#include <boost/process/v1/child.hpp>
-+#include <boost/process/v1/io.hpp>
-+#include <boost/process/v1/pipe.hpp>
-+#include <boost/process/v1/search_path.hpp>
-+#else
- #include <boost/process.hpp>
- #endif
-+#endif
- 
- namespace Slic3r {
- namespace GUI { 
---- a/src/slic3r/Config/Version.cpp
-+++ b/src/slic3r/Config/Version.cpp
-@@ -3,6 +3,7 @@
- #include <cctype>
- 
- #include <boost/filesystem/operations.hpp>
-+#include <boost/filesystem/directory.hpp>
- #include <boost/nowide/fstream.hpp>
- 
- #include "libslic3r/libslic3r.h"
---- a/src/slic3r/Utils/TCPConsole.cpp
-+++ b/src/slic3r/Utils/TCPConsole.cpp
-@@ -4,6 +4,7 @@
- #include <boost/asio/read_until.hpp>
- #include <boost/asio/steady_timer.hpp>
- #include <boost/asio/write.hpp>
-+#include <boost/asio/connect.hpp>
- #include <boost/bind/bind.hpp>
- #include <boost/format.hpp>
- #include <boost/log/trivial.hpp>
-@@ -170,7 +171,7 @@ bool TCPConsole::run_queue()
- 
-         auto endpoints = m_resolver.resolve(m_host_name, m_port_name);
- 
--        m_socket.async_connect(endpoints->endpoint(),
-+        boost::asio::async_connect(m_socket, endpoints,
-             boost::bind(&TCPConsole::handle_connect, this, boost::placeholders::_1)
-         );
- 
---- a/src/libslic3r/GCodeSender.hpp
-+++ b/src/libslic3r/GCodeSender.hpp
-@@ -35,7 +35,7 @@ class GCodeSender : private boost::noncopyable {
-     void reset();
-     
-     private:
--    asio::io_service io;
-+    asio::io_context io;
-     asio::serial_port serial;
-     boost::thread background_thread;
-     boost::asio::streambuf read_buffer, write_buffer;
+diff --git a/src/libslic3r/GCodeSender.cpp b/src/libslic3r/GCodeSender.cpp
+index 275dd61a79..4c8fe2dd43 100644
 --- a/src/libslic3r/GCodeSender.cpp
 +++ b/src/libslic3r/GCodeSender.cpp
 @@ -107,7 +107,7 @@ GCodeSender::connect(std::string devname, unsigned int baud_rate)
@@ -105,22 +30,33 @@
      this->background_thread.swap(t);
      
      // always send a M105 to check for connection because firmware might be silent on connect
---- a/src/slic3r/GUI/HttpServer.hpp
-+++ b/src/slic3r/GUI/HttpServer.hpp
-@@ -115,11 +115,11 @@ private:
-     {
-     public:
-         HttpServer&                        server;
--        boost::asio::io_service            io_service;
-+        boost::asio::io_context            io_context;
-         boost::asio::ip::tcp::acceptor     acceptor;
-         std::set<std::shared_ptr<session>> sessions;
+diff --git a/src/libslic3r/GCodeSender.hpp b/src/libslic3r/GCodeSender.hpp
+index 3a2055e54f..5c8eec4371 100644
+--- a/src/libslic3r/GCodeSender.hpp
++++ b/src/libslic3r/GCodeSender.hpp
+@@ -35,7 +35,7 @@ class GCodeSender : private boost::noncopyable {
+     void reset();
+     
+     private:
+-    asio::io_service io;
++    asio::io_context io;
+     asio::serial_port serial;
+     boost::thread background_thread;
+     boost::asio::streambuf read_buffer, write_buffer;
+diff --git a/src/slic3r/Config/Version.cpp b/src/slic3r/Config/Version.cpp
+index 092594ce51..7675082080 100644
+--- a/src/slic3r/Config/Version.cpp
++++ b/src/slic3r/Config/Version.cpp
+@@ -3,6 +3,7 @@
+ #include <cctype>
  
--        IOServer(HttpServer& server) : server(server), acceptor(io_service, {boost::asio::ip::tcp::v4(), server.port}) {}
-+        IOServer(HttpServer& server) : server(server), acceptor(io_context, {boost::asio::ip::tcp::v4(), server.port}) {}
+ #include <boost/filesystem/operations.hpp>
++#include <boost/filesystem/directory.hpp>
+ #include <boost/nowide/fstream.hpp>
  
-         void do_accept();
- 
+ #include "libslic3r/libslic3r.h"
+diff --git a/src/slic3r/GUI/HttpServer.cpp b/src/slic3r/GUI/HttpServer.cpp
+index a806bd6e24..dad7297fd3 100644
 --- a/src/slic3r/GUI/HttpServer.cpp
 +++ b/src/slic3r/GUI/HttpServer.cpp
 @@ -156,7 +156,7 @@ void HttpServer::start()
@@ -141,75 +77,69 @@
      }
      if (m_http_server_thread.joinable())
          m_http_server_thread.join();
---- a/src/slic3r/Utils/Bonjour.hpp
-+++ b/src/slic3r/Utils/Bonjour.hpp
-@@ -151,11 +151,11 @@ public:
- 	UdpSocket(Bonjour::ReplyFn replyfn
- 		, const boost::asio::ip::address& multicast_address
- 		, const boost::asio::ip::address& interface_address
--		, std::shared_ptr< boost::asio::io_service > io_service);
-+		, std::shared_ptr< boost::asio::io_context > io_context);
+diff --git a/src/slic3r/GUI/HttpServer.hpp b/src/slic3r/GUI/HttpServer.hpp
+index 91e3cd9c15..84310a02d5 100644
+--- a/src/slic3r/GUI/HttpServer.hpp
++++ b/src/slic3r/GUI/HttpServer.hpp
+@@ -128,11 +128,11 @@ private:
+     {
+     public:
+         HttpServer&                        server;
+-        boost::asio::io_service            io_service;
++        boost::asio::io_context            io_context;
+         boost::asio::ip::tcp::acceptor     acceptor;
+         std::set<std::shared_ptr<session>> sessions;
  
- 	UdpSocket(Bonjour::ReplyFn replyfn
- 		, const boost::asio::ip::address& multicast_address
--		, std::shared_ptr< boost::asio::io_service > io_service);
-+		, std::shared_ptr< boost::asio::io_context > io_context);
+-        IOServer(HttpServer& server) : server(server), acceptor(io_service, {boost::asio::ip::tcp::v4(), server.port}) {}
++        IOServer(HttpServer& server) : server(server), acceptor(io_context, {boost::asio::ip::tcp::v4(), server.port}) {}
  
- 	void send();
- 	void async_receive();
-@@ -168,7 +168,7 @@ protected:
- 	boost::asio::ip::address					    multicast_address;
- 	boost::asio::ip::udp::socket					socket;
- 	boost::asio::ip::udp::endpoint					mcast_endpoint;
--	std::shared_ptr< boost::asio::io_service >	io_service;
-+	std::shared_ptr< boost::asio::io_context >	io_context;
- 	std::vector<BonjourRequest>						requests;
- };
+         void do_accept();
  
-@@ -182,8 +182,8 @@ public:
- 		, Bonjour::ReplyFn replyfn
- 		, const boost::asio::ip::address& multicast_address
- 		, const boost::asio::ip::address& interface_address
--		, std::shared_ptr< boost::asio::io_service > io_service)
--		: UdpSocket(replyfn, multicast_address, interface_address, io_service)
-+		, std::shared_ptr< boost::asio::io_context > io_context)
-+		: UdpSocket(replyfn, multicast_address, interface_address, io_context)
- 		, txt_keys(txt_keys)
- 		, service(service)
- 		, service_dn(service_dn)
-@@ -199,8 +199,8 @@ public:
- 		, std::string protocol
- 		, Bonjour::ReplyFn replyfn
- 		, const boost::asio::ip::address& multicast_address
--		, std::shared_ptr< boost::asio::io_service > io_service)
--		: UdpSocket(replyfn, multicast_address, io_service)
-+		, std::shared_ptr< boost::asio::io_context > io_context)
-+		: UdpSocket(replyfn, multicast_address, io_context)
- 		, txt_keys(txt_keys)
- 		, service(service)
- 		, service_dn(service_dn)
-@@ -237,8 +237,8 @@ public:
- 		, Bonjour::ReplyFn replyfn
- 		, const boost::asio::ip::address& multicast_address
- 		, const boost::asio::ip::address& interface_address
--		, std::shared_ptr< boost::asio::io_service > io_service)
--		: UdpSocket(replyfn, multicast_address, interface_address, io_service)
-+		, std::shared_ptr< boost::asio::io_context > io_context)
-+		: UdpSocket(replyfn, multicast_address, interface_address, io_context)
- 		, hostname(hostname)
+diff --git a/src/slic3r/GUI/MediaPlayCtrl.cpp b/src/slic3r/GUI/MediaPlayCtrl.cpp
+index 98b9fd797b..d3f3c84960 100644
+--- a/src/slic3r/GUI/MediaPlayCtrl.cpp
++++ b/src/slic3r/GUI/MediaPlayCtrl.cpp
+@@ -15,7 +15,17 @@
+ #include <boost/nowide/cstdio.hpp>
+ #include <boost/nowide/utf8_codecvt.hpp>
+ #undef pid_t
++#if BOOST_VERSION >= 108800 // v2 is now default
++#define BOOST_PROCESS_VERSION 1
++#include <boost/process/v1/child.hpp>
++#include <boost/process/v1/io.hpp>
++#include <boost/process/v1/pipe.hpp>
++#include <boost/process/v1/search_path.hpp>
++#include <boost/process/v1/start_dir.hpp>
++#include <boost/process/v1/handles.hpp>
++#else
+ #include <boost/process.hpp>
++#endif
+ #ifdef __WIN32__
+ #include <boost/process/windows.hpp>
+ #else
+diff --git a/src/slic3r/GUI/RemovableDriveManager.cpp b/src/slic3r/GUI/RemovableDriveManager.cpp
+index 83ec4695c7..c888ddfbcb 100644
+--- a/src/slic3r/GUI/RemovableDriveManager.cpp
++++ b/src/slic3r/GUI/RemovableDriveManager.cpp
+@@ -22,8 +22,16 @@
+ #include <pwd.h>
+ #include <boost/filesystem.hpp>
+ #include <boost/system/error_code.hpp>
++#if BOOST_VERSION >= 108800 // v2 is now default
++#define BOOST_PROCESS_VERSION 1
++#include <boost/process/v1/child.hpp>
++#include <boost/process/v1/io.hpp>
++#include <boost/process/v1/pipe.hpp>
++#include <boost/process/v1/search_path.hpp>
++#else
+ #include <boost/process.hpp>
+ #endif
++#endif
  
- 	{
-@@ -249,8 +249,8 @@ public:
- 	ResolveSocket(const std::string& hostname
- 		, Bonjour::ReplyFn replyfn
- 		, const boost::asio::ip::address& multicast_address
--		, std::shared_ptr< boost::asio::io_service > io_service)
--		: UdpSocket(replyfn, multicast_address, io_service)
-+		, std::shared_ptr< boost::asio::io_context > io_context)
-+		: UdpSocket(replyfn, multicast_address, io_context)
- 		, hostname(hostname)
- 
- 	{
+ namespace Slic3r {
+ namespace GUI { 
+diff --git a/src/slic3r/Utils/Bonjour.cpp b/src/slic3r/Utils/Bonjour.cpp
+index 0701695eff..53cf3e5913 100644
 --- a/src/slic3r/Utils/Bonjour.cpp
 +++ b/src/slic3r/Utils/Bonjour.cpp
 @@ -620,11 +620,11 @@ UdpSession::UdpSession(Bonjour::ReplyFn rfn) : replyfn(rfn)
@@ -387,19 +317,79 @@
  	}
  	catch (std::exception& e) {
  		BOOST_LOG_TRIVIAL(error) << e.what();
---- a/src/slic3r/Utils/Serial.hpp
-+++ b/src/slic3r/Utils/Serial.hpp
-@@ -39,8 +39,8 @@ extern std::vector<SerialPortInfo> 	scan_serial_ports_extended();
- class Serial : public boost::asio::serial_port
- {
- public:
--	Serial(boost::asio::io_service &io_service);
--	Serial(boost::asio::io_service &io_service, const std::string &name, unsigned baud_rate);
-+	Serial(boost::asio::io_context &io_context);
-+	Serial(boost::asio::io_context &io_context, const std::string &name, unsigned baud_rate);
- 	Serial(const Serial &) = delete;
- 	Serial &operator=(const Serial &) = delete;
- 	~Serial();
+diff --git a/src/slic3r/Utils/Bonjour.hpp b/src/slic3r/Utils/Bonjour.hpp
+index 50b71791fa..3bdbac3427 100644
+--- a/src/slic3r/Utils/Bonjour.hpp
++++ b/src/slic3r/Utils/Bonjour.hpp
+@@ -151,11 +151,11 @@ public:
+ 	UdpSocket(Bonjour::ReplyFn replyfn
+ 		, const boost::asio::ip::address& multicast_address
+ 		, const boost::asio::ip::address& interface_address
+-		, std::shared_ptr< boost::asio::io_service > io_service);
++		, std::shared_ptr< boost::asio::io_context > io_context);
+ 
+ 	UdpSocket(Bonjour::ReplyFn replyfn
+ 		, const boost::asio::ip::address& multicast_address
+-		, std::shared_ptr< boost::asio::io_service > io_service);
++		, std::shared_ptr< boost::asio::io_context > io_context);
+ 
+ 	void send();
+ 	void async_receive();
+@@ -168,7 +168,7 @@ protected:
+ 	boost::asio::ip::address					    multicast_address;
+ 	boost::asio::ip::udp::socket					socket;
+ 	boost::asio::ip::udp::endpoint					mcast_endpoint;
+-	std::shared_ptr< boost::asio::io_service >	io_service;
++	std::shared_ptr< boost::asio::io_context >	io_context;
+ 	std::vector<BonjourRequest>						requests;
+ };
+ 
+@@ -182,8 +182,8 @@ public:
+ 		, Bonjour::ReplyFn replyfn
+ 		, const boost::asio::ip::address& multicast_address
+ 		, const boost::asio::ip::address& interface_address
+-		, std::shared_ptr< boost::asio::io_service > io_service)
+-		: UdpSocket(replyfn, multicast_address, interface_address, io_service)
++		, std::shared_ptr< boost::asio::io_context > io_context)
++		: UdpSocket(replyfn, multicast_address, interface_address, io_context)
+ 		, txt_keys(txt_keys)
+ 		, service(service)
+ 		, service_dn(service_dn)
+@@ -199,8 +199,8 @@ public:
+ 		, std::string protocol
+ 		, Bonjour::ReplyFn replyfn
+ 		, const boost::asio::ip::address& multicast_address
+-		, std::shared_ptr< boost::asio::io_service > io_service)
+-		: UdpSocket(replyfn, multicast_address, io_service)
++		, std::shared_ptr< boost::asio::io_context > io_context)
++		: UdpSocket(replyfn, multicast_address, io_context)
+ 		, txt_keys(txt_keys)
+ 		, service(service)
+ 		, service_dn(service_dn)
+@@ -237,8 +237,8 @@ public:
+ 		, Bonjour::ReplyFn replyfn
+ 		, const boost::asio::ip::address& multicast_address
+ 		, const boost::asio::ip::address& interface_address
+-		, std::shared_ptr< boost::asio::io_service > io_service)
+-		: UdpSocket(replyfn, multicast_address, interface_address, io_service)
++		, std::shared_ptr< boost::asio::io_context > io_context)
++		: UdpSocket(replyfn, multicast_address, interface_address, io_context)
+ 		, hostname(hostname)
+ 
+ 	{
+@@ -249,8 +249,8 @@ public:
+ 	ResolveSocket(const std::string& hostname
+ 		, Bonjour::ReplyFn replyfn
+ 		, const boost::asio::ip::address& multicast_address
+-		, std::shared_ptr< boost::asio::io_service > io_service)
+-		: UdpSocket(replyfn, multicast_address, io_service)
++		, std::shared_ptr< boost::asio::io_context > io_context)
++		: UdpSocket(replyfn, multicast_address, io_context)
+ 		, hostname(hostname)
+ 
+ 	{
+diff --git a/src/slic3r/Utils/Serial.cpp b/src/slic3r/Utils/Serial.cpp
+index 4db1acc6b6..e5482fa1bf 100644
 --- a/src/slic3r/Utils/Serial.cpp
 +++ b/src/slic3r/Utils/Serial.cpp
 @@ -278,12 +278,12 @@ std::vector<std::string> scan_serial_ports()
@@ -451,3 +441,39 @@
  
  		if (fail) {
  			return false;
+diff --git a/src/slic3r/Utils/Serial.hpp b/src/slic3r/Utils/Serial.hpp
+index 8bad75b315..138c238a49 100644
+--- a/src/slic3r/Utils/Serial.hpp
++++ b/src/slic3r/Utils/Serial.hpp
+@@ -39,8 +39,8 @@ extern std::vector<SerialPortInfo> 	scan_serial_ports_extended();
+ class Serial : public boost::asio::serial_port
+ {
+ public:
+-	Serial(boost::asio::io_service &io_service);
+-	Serial(boost::asio::io_service &io_service, const std::string &name, unsigned baud_rate);
++	Serial(boost::asio::io_context &io_context);
++	Serial(boost::asio::io_context &io_context, const std::string &name, unsigned baud_rate);
+ 	Serial(const Serial &) = delete;
+ 	Serial &operator=(const Serial &) = delete;
+ 	~Serial();
+diff --git a/src/slic3r/Utils/TCPConsole.cpp b/src/slic3r/Utils/TCPConsole.cpp
+index 25802e3908..5f1f2a5bf5 100644
+--- a/src/slic3r/Utils/TCPConsole.cpp
++++ b/src/slic3r/Utils/TCPConsole.cpp
+@@ -4,6 +4,7 @@
+ #include <boost/asio/read_until.hpp>
+ #include <boost/asio/steady_timer.hpp>
+ #include <boost/asio/write.hpp>
++#include <boost/asio/connect.hpp>
+ #include <boost/bind/bind.hpp>
+ #include <boost/format.hpp>
+ #include <boost/log/trivial.hpp>
+@@ -170,7 +171,7 @@ bool TCPConsole::run_queue()
+ 
+         auto endpoints = m_resolver.resolve(m_host_name, m_port_name);
+ 
+-        m_socket.async_connect(endpoints->endpoint(),
++        boost::asio::async_connect(m_socket, endpoints,
+             boost::bind(&TCPConsole::handle_connect, this, boost::placeholders::_1)
+         );
+ 

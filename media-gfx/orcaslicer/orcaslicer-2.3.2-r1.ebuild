@@ -70,16 +70,15 @@ DEPEND="${RDEPEND}
 
 PATCHES=(
 	"${FILESDIR}/${PN}-2.3.1-cgal-6.0.patch"
-	"${FILESDIR}/${PN}-2.3.1-boost-1.88.patch"
 	"${FILESDIR}/${PN}-2.3.1-opencascade-7.8.0.patch"
 	"${FILESDIR}/${PN}-2.3.1-dont-expect-opencv_world.patch"
 	"${FILESDIR}/${PN}-2.3.1-PhysicalPrinterDialog.patch"
+	"${FILESDIR}/${PN}-2.3.2-boost-1.88.patch"
+	"${FILESDIR}/${PN}-2.3.2-boost-1.90.patch"
 	"${FILESDIR}/${PN}-2.3.2-fix-linking-to-webkitgtk.patch"
 )
 
 src_prepare() {
-	# sed -i -e 's/find_package(OpenCASCADE 7.6.2 REQUIRED)/find_package(OpenCASCADE REQUIRED)/g' \
-	# 	src/occt_wrapper/CMakeLists.txt || die
 	cmake_src_prepare
 }
 

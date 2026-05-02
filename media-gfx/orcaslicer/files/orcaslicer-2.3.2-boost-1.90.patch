@@ -1,0 +1,80 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index af78323a15..c43c2c3f7e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -583,7 +583,7 @@ if(POLICY CMP0167)
+   cmake_policy(SET CMP0167 NEW)
+ endif()
+ set(Boost_NO_SYSTEM_PATHS TRUE)
+-find_package(Boost 1.83.0 REQUIRED COMPONENTS system filesystem thread log log_setup locale regex chrono atomic date_time iostreams program_options nowide)
++find_package(Boost 1.83.0 REQUIRED COMPONENTS filesystem thread log log_setup locale regex chrono atomic date_time iostreams program_options nowide)
+ 
+ add_library(boost_libs INTERFACE)
+ add_library(boost_headeronly INTERFACE)
+diff --git a/src/slic3r/Utils/Bonjour.cpp b/src/slic3r/Utils/Bonjour.cpp
+index 53cf3e5913..be712e0a44 100644
+--- a/src/slic3r/Utils/Bonjour.cpp
++++ b/src/slic3r/Utils/Bonjour.cpp
+@@ -8,7 +8,7 @@
+ #include <map>
+ #include <thread>
+ #include <boost/endian/conversion.hpp>
+-#include <boost/date_time/posix_time/posix_time_duration.hpp>
++#include <chrono>
+ #include <boost/format.hpp>
+ #include <boost/log/trivial.hpp>
+ #include <boost/bind/bind.hpp>
+@@ -919,7 +919,7 @@ void Bonjour::priv::lookup_perform()
+ 			socket->send();
+ 
+ 		// timer settings
+-		asio::deadline_timer timer(*io_context);
++		asio::steady_timer timer(*io_context);
+ 		retries--;
+ 		std::function<void(const error_code&)> timer_handler = [&](const error_code& error) {
+ 			// end 
+@@ -932,7 +932,7 @@ void Bonjour::priv::lookup_perform()
+ 			// restart timer
+ 			} else {
+ 				retries--;
+-				timer.expires_from_now(boost::posix_time::seconds(timeout));
++				timer.expires_after(std::chrono::seconds(timeout));
+ 				timer.async_wait(timer_handler);
+ 				// trigger another round of queries
+ 				for (auto * socket : sockets)
+@@ -940,7 +940,7 @@ void Bonjour::priv::lookup_perform()
+ 			}
+ 		};
+ 		// start timer
+-		timer.expires_from_now(boost::posix_time::seconds(timeout));
++		timer.expires_after(std::chrono::seconds(timeout));
+ 		timer.async_wait(timer_handler);
+ 		// start io_service, it will run until it has something to do - so in this case until stop is called in timer
+ 		io_context->run();
+@@ -1012,7 +1012,7 @@ void Bonjour::priv::resolve_perform()
+ 			socket->send();
+ 
+ 		// timer settings
+-		asio::deadline_timer timer(*io_context);
++		asio::steady_timer timer(*io_context);
+ 		retries--;
+ 		std::function<void(const error_code&)> timer_handler = [&](const error_code& error) {
+ 			int replies_count = replies.size();
+@@ -1026,7 +1026,7 @@ void Bonjour::priv::resolve_perform()
+ 			// restart timer
+ 			} else {
+ 				retries--;
+-				timer.expires_from_now(boost::posix_time::seconds(timeout));
++				timer.expires_after(std::chrono::seconds(timeout));
+ 				timer.async_wait(timer_handler);
+ 				// trigger another round of queries
+ 				for (auto * socket : sockets)
+@@ -1034,7 +1034,7 @@ void Bonjour::priv::resolve_perform()
+ 			}
+ 		};
+ 		// start timer
+-		timer.expires_from_now(boost::posix_time::seconds(timeout));
++		timer.expires_after(std::chrono::seconds(timeout));
+ 		timer.async_wait(timer_handler);
+ 		// start io_service, it will run until it has something to do - so in this case until stop is called in timer
+ 		io_context->run();
