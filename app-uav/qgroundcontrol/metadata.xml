@@ -5,4 +5,10 @@
     <email>getburning@bakka.su</email>
     <description>In getburning overlay.</description>
   </maintainer>
+  <use>
+    <flag name="vaapi">Enable hardware-accelerated video decoding via <pkg>media-plugins/gst-plugins-vaapi</pkg></flag>
+  </use>
+  <upstream>
+    <remote-id type="github">mavlink/qgroundcontrol</remote-id>
+  </upstream>
 </pkgmetadata>

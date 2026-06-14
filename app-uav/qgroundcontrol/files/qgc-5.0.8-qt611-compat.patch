@@ -1,0 +1,20 @@
+--- a/src/QtLocationPlugin/QGCTileCacheWorker.h
++++ b/src/QtLocationPlugin/QGCTileCacheWorker.h
+@@ -19,6 +19,7 @@
+ #include <QtCore/QQueue>
+ #include <QtCore/QString>
+ #include <QtCore/QThread>
++#include <QtCore/QElapsedTimer>
+ #include <QtCore/QWaitCondition>
+ 
+ Q_DECLARE_LOGGING_CATEGORY(QGCTileCacheWorkerLog)
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -243,8 +243,6 @@
+ else()
+     add_compile_definitions(
+-        QT_DISABLE_DEPRECATED_UP_TO=0x060800
+-        QT_ENABLE_STRICT_MODE_UP_TO=0x060800
+         $<$<BOOL:${QGC_DEBUG_QML}>:QT_QML_DEBUG>
+     )
+ endif()
