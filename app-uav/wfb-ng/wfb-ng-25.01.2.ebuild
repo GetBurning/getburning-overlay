@@ -6,11 +6,13 @@ EAPI=8
 PYTHON_COMPAT=( python3_{11..13} )
 DISTUTILS_USE_PEP517=setuptools
 
-inherit distutils-r1 git-r3
+inherit distutils-r1
 
 DESCRIPTION="Long-range radio link based on raw WiFi radio"
 HOMEPAGE="https://github.com/svpcom/wfb-ng"
-EGIT_REPO_URI="https://github.com/svpcom/wfb-ng"
+MY_TAG="${P}"
+SRC_URI="https://github.com/svpcom/wfb-ng/archive/refs/tags/${MY_TAG}.tar.gz"
+S="${WORKDIR}/${PN}-${MY_TAG}"
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -42,12 +44,8 @@ distutils_enable_tests pytest
 
 src_configure() {
 	# setup.py asserts VERSION and COMMIT are set (used for version stamping)
-	local commit
-	commit="$(git rev-parse HEAD)"
-	export VERSION="$(python ./version.py \
-		"$(git show -s --format='%ct' "${commit}")" \
-		"$(git rev-parse --abbrev-ref HEAD)")"
-	export COMMIT="${commit}"
+	export VERSION="${PV}"
+	export COMMIT="${MY_TAG}"
 	# Skip setup.py data_files install (absolute paths end up under
 	# site-packages in PEP517 mode, and wfb_rtsp needs gstreamer).
 	# We install C binaries manually in python_install_all.
@@ -84,4 +82,6 @@ python_install_all() {
 	if ! use systemd; then
 		rm -r "${ED}/lib/systemd" 2>/dev/null || true
 	fi
+
+	dodoc README.md
 }
