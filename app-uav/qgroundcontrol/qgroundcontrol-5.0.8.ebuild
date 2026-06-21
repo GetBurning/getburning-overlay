@@ -27,13 +27,12 @@ S="${WORKDIR}/qgroundcontrol-${PV}"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~arm"
+KEYWORDS=""
 IUSE="+vaapi alsa pulseaudio jack"
 RESTRICT="mirror"
 
-# System libraries replace CPM-fetched SDL2, shapelib, zlib,
-# GeographicLib. Remaining third_party deps are pre-fetched via
-# SRC_URI tarballs — no network access during build.
+# All dependencies pre-fetched via SRC_URI — no network access during build.
+# System libraries replace SDL2, zlib, shapelib, GeographicLib.
 RDEPEND="
 	dev-qt/qtbase:6=[concurrent,gui,network,opengl,sql,widgets,xml]
 	dev-qt/qt5compat:6
