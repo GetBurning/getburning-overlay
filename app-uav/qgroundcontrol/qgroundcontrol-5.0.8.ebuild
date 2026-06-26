@@ -69,8 +69,7 @@ DEPEND="${RDEPEND}"
 BDEPEND="dev-qt/qttools:6"
 
 PATCHES=(
-	"${FILESDIR}/qgc-5.0.8-system-libs.patch"
-	"${FILESDIR}/qgc-5.0.8-qt611-compat.patch"
+	"${FILESDIR}/qgc-5.0.8-system-and-offline.patch"
 )
 
 src_unpack() {
@@ -81,9 +80,10 @@ src_unpack() {
 	local tp="${S}/third_party"
 
 	# ArduPilot parameter repository (submodule)
-	local apmdir="${WORKDIR}/qgroundcontrol-${PV}/src/FirmwarePlugin/APM/ArduPilot-Parameter-Repository"
-	rm -rf "${apmdir}"
-	mv "${WORKDIR}/ParameterRepository-"*/ "${apmdir}" || die
+	rm -rf src/FirmwarePlugin/APM/ArduPilot-Parameter-Repository
+	mkdir -p src/FirmwarePlugin/APM/ArduPilot-Parameter-Repository
+	mv "${WORKDIR}/ParameterRepository-"*/* \
+		src/FirmwarePlugin/APM/ArduPilot-Parameter-Repository/ || die
 
 	# Third-party sources expected by CMakeLists.txt
 	mv "${WORKDIR}/c_library_v2-"*		"${tp}/mavlink" || die
@@ -100,6 +100,9 @@ src_unpack() {
 }
 
 src_prepare() {
+	# Normalize CRLF line endings in CMake files
+	sed -i 's/\r$//' src/MAVLink/LibEvents/CMakeLists.txt || die
+
 	cmake_src_prepare
 
 	# Add system library find_package calls to main CMakeLists.txt
@@ -131,16 +134,9 @@ pkg_check_modules(SHP REQUIRED IMPORTED_TARGET shapelib)' \
 		}' \
 		CMakeLists.txt || die
 
-	# Fix: cmake pkg_check_modules picks up 32-bit glibconfig.h from
-	# /usr/lib/glib-2.0/include (multilib) instead of the correct
-	# /usr/lib64/glib-2.0/include. Add correct include path to gstqml6gl.
-	sed -i \
-		-e '/target_link_libraries(gstqml6gl PUBLIC GStreamer::GStreamer)/a\    target_include_directories(gstqml6gl PRIVATE /usr/lib64/glib-2.0/include)' \
-		src/VideoManager/VideoReceiver/GStreamer/gstqml6gl/CMakeLists.txt || die
-
 	# Fix: cmake/Git.cmake fails when not in a git repo (tarball build).
 	# Hardcode version info instead of using git commands.
-	cat > cmake/Git.cmake <<-'GITEOF'
+	cat > cmake/Git.cmake <<-'EOF'
 	set(QGC_GIT_BRANCH "release")
 	set(QGC_GIT_HASH "${PV}")
 	set(QGC_APP_VERSION_STR "v${PV}")
@@ -150,11 +146,17 @@ pkg_check_modules(SHP REQUIRED IMPORTED_TARGET shapelib)' \
 	set(QGC_APP_VERSION_MAJOR ${CMAKE_MATCH_1})
 	set(QGC_APP_VERSION_MINOR ${CMAKE_MATCH_2})
 	set(QGC_APP_VERSION_PATCH ${CMAKE_MATCH_3})
-	GITEOF
+	EOF
 }
 
 src_configure() {
 	xdg_environment_reset
+
+	# Fix: cmake pkg_check_modules picks up 32-bit glibconfig.h from
+	# /usr/lib/glib-2.0/include (multilib) instead of the correct
+	# /usr/lib64/glib-2.0/include. Force the 64-bit include path.
+	append-cxxflags "-I/usr/lib64/glib-2.0/include"
+
 	local mycmakeargs=(
 		-DOpenGL_GL_PREFERENCE=GLVND
 		-DBUILD_SHARED_LIBS=OFF

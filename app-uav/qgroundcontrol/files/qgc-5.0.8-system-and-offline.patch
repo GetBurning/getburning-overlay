@@ -1,0 +1,334 @@
+diff -ruN '--exclude=.git' '--exclude=third_party' a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/CMakeLists.txt	2026-06-21 08:39:18.409254270 +0300
+@@ -243,8 +243,6 @@
+     )
+ else()
+     add_compile_definitions(
+-        QT_DISABLE_DEPRECATED_UP_TO=0x060800
+-        QT_ENABLE_STRICT_MODE_UP_TO=0x060800
+         $<$<BOOL:${QGC_DEBUG_QML}>:QT_QML_DEBUG>
+     )
+ endif()
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/ADSB/ADSBVehicle.cc b/src/ADSB/ADSBVehicle.cc
+--- a/src/ADSB/ADSBVehicle.cc	2025-10-09 02:17:49.000000000 +0300
++++ b/src/ADSB/ADSBVehicle.cc	2026-06-21 08:39:18.409320903 +0300
+@@ -36,7 +36,7 @@
+         return;
+     }
+ 
+-    qCDebug(ADSBVehicleLog) << "Updating" << QStringLiteral("%1 Flags: %2").arg(vehicleInfo.icaoAddress, 0, 16).arg(vehicleInfo.availableFlags, 0, 2);
++    qCDebug(ADSBVehicleLog) << "Updating" << QStringLiteral("%1 Flags: %2").arg(vehicleInfo.icaoAddress, 0, 16).arg(static_cast<int>(vehicleInfo.availableFlags), 0, 2);
+ 
+     if (vehicleInfo.availableFlags & ADSB::LocationAvailable) {
+         if (!QGC::fuzzyCompare(vehicleInfo.location.latitude(), coordinate().latitude()) || !QGC::fuzzyCompare(vehicleInfo.location.longitude(), coordinate().longitude())) {
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/AnalyzeView/CMakeLists.txt b/src/AnalyzeView/CMakeLists.txt
+--- a/src/AnalyzeView/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/src/AnalyzeView/CMakeLists.txt	2026-06-21 08:39:18.409181339 +0300
+@@ -48,11 +48,11 @@
+ 
+ #===========================================================================#
+ 
+-CPMAddPackage(
+-    NAME ulog_cpp
+-    GITHUB_REPOSITORY PX4/ulog_cpp
+-    GIT_TAG main
+-)
++set(ulog_cpp_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/ulog_cpp")
++if(NOT EXISTS "${ulog_cpp_SOURCE_DIR}")
++    message(FATAL_ERROR "ulog_cpp source directory not found at ${ulog_cpp_SOURCE_DIR}")
++endif()
++add_subdirectory(${ulog_cpp_SOURCE_DIR} ${CMAKE_BINARY_DIR}/_deps/ulog_cpp-build)
+ 
+ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+     target_compile_options(ulog_cpp PRIVATE -Wno-unknown-warning-option)
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/GPS/CMakeLists.txt b/src/GPS/CMakeLists.txt
+--- a/src/GPS/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/src/GPS/CMakeLists.txt	2026-06-21 08:39:18.409194503 +0300
+@@ -25,12 +25,10 @@
+ 
+ #===========================================================================#
+ 
+-CPMAddPackage(
+-    NAME px4-gpsdrivers
+-    GITHUB_REPOSITORY PX4/PX4-GPSDrivers
+-    GIT_TAG main
+-    SOURCE_SUBDIR src
+-)
++set(px4-gpsdrivers_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/px4-gpsdrivers")
++if(NOT EXISTS "${px4-gpsdrivers_SOURCE_DIR}")
++    message(FATAL_ERROR "px4-gpsdrivers source directory not found at ${px4-gpsdrivers_SOURCE_DIR}")
++endif()
+ 
+ file(GLOB GPS_DRIVERS_SOURCES "${px4-gpsdrivers_SOURCE_DIR}/src/*")
+ target_sources(${CMAKE_PROJECT_NAME}
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/GPS/GPSProvider.cc b/src/GPS/GPSProvider.cc
+--- a/src/GPS/GPSProvider.cc	2025-10-09 02:17:49.000000000 +0300
++++ b/src/GPS/GPSProvider.cc	2026-06-21 08:39:18.409338645 +0300
+@@ -220,7 +220,7 @@
+         baudrate = 0;
+         break;
+     case GPSType::u_blox:
+-        gpsDriver = new GPSDriverUBX(GPSDriverUBX::Interface::UART, &_callbackEntry, this, &_sensorGps, &_satelliteInfo);
++        gpsDriver = new GPSDriverUBX(GPSDriverUBX::Interface::UART, &_callbackEntry, this, &_sensorGps, &_satelliteInfo, GPSDriverUBX::Settings{});
+         baudrate = 0;
+         break;
+     case GPSType::femto:
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/Joystick/CMakeLists.txt b/src/Joystick/CMakeLists.txt
+--- a/src/Joystick/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/src/Joystick/CMakeLists.txt	2026-06-21 08:39:18.409086926 +0300
+@@ -37,57 +37,6 @@
+ 
+ #===========================================================================#
+ 
+-set(SDL2_EXTRA_OPTIONS)
+-if(WIN32)
+-    set(SDL2_EXTRA_OPTIONS
+-        "SDL_DIRECTX OFF"
+-        "SDL_XINPUT ON"
+-    )
+-endif()
+-
+-CPMAddPackage(
+-    NAME SDL2
+-    VERSION 2.32.4
+-    GITHUB_REPOSITORY libsdl-org/SDL
+-    GIT_TAG release-2.32.4
+-    OPTIONS
+-        "SDL2_DISABLE_INSTALL ON"
+-        "SDL2_DISABLE_INSTALL ON"
+-        "SDL2_DISABLE_UNINSTALL ON"
+-        "SDL2_DISABLE_SDL2MAIN ON"
+-        "SDL_SHARED OFF"
+-        "SDL_STATIC ON"
+-        "SDL_TEST OFF"
+-        "SDL_ATOMIC ON"
+-        "SDL_AUDIO OFF"
+-        "SDL_CPUINFO ON"
+-        "SDL_EVENTS ON"
+-        "SDL_FILE OFF"
+-        "SDL_FILESYSTEM OFF"
+-        "SDL_HAPTIC ON"
+-        "SDL_HIDAPI ON"
+-        "SDL_JOYSTICK ON"
+-        "SDL_LOADSO ON"
+-        "SDL_LOCALE OFF"
+-        "SDL_MISC OFF"
+-        "SDL_POWER ON"
+-        "SDL_RENDER OFF"
+-        "SDL_SENSOR OFF"
+-        "SDL_THREADS ON"
+-        "SDL_TIMERS OFF"
+-        "SDL_VIDEO OFF"
+-        "SDL_3DNOW OFF"
+-        "SDL_DBUS OFF"
+-        "SDL_IBUS OFF"
+-        "SDL_MMX OFF"
+-        "SDL_VIRTUAL_JOYSTICK ON"
+-        "${SDL2_EXTRA_OPTIONS}"
+-)
+-
+-target_compile_definitions(SDL2-static PRIVATE SDL_MAIN_HANDLED)
+-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SDL2::SDL2-static)
+-
+-# Default list of config overrides - TODO: Add to Custom Build Options
+-# set(ENV{SDL_GAMECONTROLLERCONFIG}
+-#   "0300000009120000544f000011010000,OpenTX Radiomaster TX16S Joystick,leftx:a3,lefty:a2,rightx:a0,righty:a1,platform:Linux"
+-# )
++find_package(SDL2 REQUIRED)
++target_compile_definitions(SDL2::SDL2 INTERFACE SDL_MAIN_HANDLED)
++target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SDL2::SDL2)
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/MAVLink/CMakeLists.txt b/src/MAVLink/CMakeLists.txt
+--- a/src/MAVLink/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/src/MAVLink/CMakeLists.txt	2026-06-21 08:39:18.409154677 +0300
+@@ -33,11 +33,10 @@
+ #         "MAVLINK_VERSION 2.0"
+ # )
+ 
+-CPMAddPackage(
+-    NAME mavlink
+-    GIT_REPOSITORY ${QGC_MAVLINK_GIT_REPO}
+-    GIT_TAG ${QGC_MAVLINK_GIT_TAG}
+-)
++set(mavlink_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/mavlink")
++if(NOT EXISTS "${mavlink_SOURCE_DIR}")
++    message(FATAL_ERROR "mavlink source directory not found at ${mavlink_SOURCE_DIR}")
++endif()
+ 
+ # For QGC all dialects means common and development. Though use of development mavlink code should be restricted to debug builds only.
+ target_include_directories(${CMAKE_PROJECT_NAME}
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/MAVLink/LibEvents/CMakeLists.txt b/src/MAVLink/LibEvents/CMakeLists.txt
+--- a/src/MAVLink/LibEvents/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/src/MAVLink/LibEvents/CMakeLists.txt	2026-06-21 08:39:18.409168345 +0300
+@@ -1,22 +1,20 @@
+-target_sources(${CMAKE_PROJECT_NAME}
+-    PRIVATE
+-        EventHandler.cc
+-        EventHandler.h
+-        HealthAndArmingCheckReport.cc
+-        HealthAndArmingCheckReport.h
+-        logging.cpp
+-)
+-
+-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+-
+-#===========================================================================#
+-
+-CPMAddPackage(
+-    NAME libevents
+-    GITHUB_REPOSITORY mavlink/libevents
+-    GIT_TAG main
+-    SOURCE_SUBDIR libs/cpp
+-)
+-
+-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE libevents)
+-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${libevents_SOURCE_DIR}/libs/cpp)
++target_sources(${CMAKE_PROJECT_NAME}
++    PRIVATE
++        EventHandler.cc
++        EventHandler.h
++        HealthAndArmingCheckReport.cc
++        HealthAndArmingCheckReport.h
++        logging.cpp
++)
++
++target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
++
++#===========================================================================#
++
++set(libevents_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/libevents")
++if(NOT EXISTS "${libevents_SOURCE_DIR}")
++    message(FATAL_ERROR "libevents source directory not found at ${libevents_SOURCE_DIR}")
++endif()
++add_subdirectory(${libevents_SOURCE_DIR}/libs/cpp ${CMAKE_BINARY_DIR}/_deps/libevents-build)
++target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${libevents_SOURCE_DIR}/libs/cpp)
++target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE libevents)
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/QGCApplication.cc b/src/QGCApplication.cc
+--- a/src/QGCApplication.cc	2025-10-09 02:17:49.000000000 +0300
++++ b/src/QGCApplication.cc	2026-06-21 08:39:18.409301268 +0300
+@@ -698,7 +698,7 @@
+             continue;
+         }
+         const QMetaCallEvent *cur_mce = static_cast<QMetaCallEvent*>(cur.event);
+-        if (cur_mce->sender() != mce->sender() || cur_mce->signalId() != mce->signalId() || cur_mce->id() != mce->id()) {
++        if (cur_mce->sender() != mce->sender() || cur_mce->signalId() != mce->signalId()) {
+             continue;
+         }
+         /* Keep The Newest Call */
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/QtLocationPlugin/QGCTileCacheWorker.h b/src/QtLocationPlugin/QGCTileCacheWorker.h
+--- a/src/QtLocationPlugin/QGCTileCacheWorker.h	2025-10-09 02:17:49.000000000 +0300
++++ b/src/QtLocationPlugin/QGCTileCacheWorker.h	2026-06-21 08:39:18.409208320 +0300
+@@ -23,6 +23,7 @@
+ #include <QtCore/QQueue>
+ #include <QtCore/QString>
+ #include <QtCore/QThread>
++#include <QtCore/QElapsedTimer>
+ #include <QtCore/QWaitCondition>
+ 
+ Q_DECLARE_LOGGING_CATEGORY(QGCTileCacheWorkerLog)
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/Utilities/Compression/CMakeLists.txt b/src/Utilities/Compression/CMakeLists.txt
+--- a/src/Utilities/Compression/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/src/Utilities/Compression/CMakeLists.txt	2026-06-21 08:39:18.409112099 +0300
+@@ -12,40 +12,15 @@
+ 
+ #===========================================================================#
+ 
+-set(ZLIB_EXTRA_OPTIONS)
+-if(WIN32)
+-    set(ZLIB_EXTRA_OPTIONS
+-        "ZLIB_INSTALL_COMPAT_DLL OFF"
+-    )
+-endif()
+-
+-CPMAddPackage(
+-    NAME zlib
+-    GITHUB_REPOSITORY madler/zlib
+-    GIT_TAG develop
+-    OPTIONS
+-        "ZLIB_BUILD_TESTING OFF"
+-        "ZLIB_BUILD_SHARED OFF"
+-        "ZLIB_BUILD_STATIC ON"
+-        "ZLIB_BUILD_MINIZIP OFF"
+-        "ZLIB_INSTALL OFF"
+-        "ZLIB_PREFIX OFF"
+-        "${ZLIB_EXTRA_OPTIONS}"
+-)
+-
+-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZLIB::ZLIBSTATIC)
++find_package(ZLIB REQUIRED)
++target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZLIB::ZLIB)
+ 
+ #===========================================================================#
+ 
+-CPMAddPackage(
+-    NAME xz-embedded
+-    VERSION 2024-12-30
+-    GITHUB_REPOSITORY tukaani-project/xz-embedded
+-    OPTIONS
+-        "BUILD_SHAPELIB_CONTRIB OFF"
+-        "BUILD_APPS OFF"
+-        "BUILD_TESTING OFF"
+-)
++set(xz-embedded_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/xz-embedded")
++if(NOT EXISTS "${xz-embedded_SOURCE_DIR}")
++    message(FATAL_ERROR "xz-embedded source directory not found at ${xz-embedded_SOURCE_DIR}")
++endif()
+ 
+ qt_add_library(xz STATIC
+     ${xz-embedded_SOURCE_DIR}/linux/include/linux/xz.h
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/Utilities/Geo/CMakeLists.txt b/src/Utilities/Geo/CMakeLists.txt
+--- a/src/Utilities/Geo/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/src/Utilities/Geo/CMakeLists.txt	2026-06-21 08:39:18.409128048 +0300
+@@ -8,30 +8,5 @@
+ 
+ #===========================================================================#
+ 
+-CPMAddPackage(
+-    NAME geographiclib
+-    VERSION 2.5
+-    GITHUB_REPOSITORY geographiclib/geographiclib
+-    GIT_TAG r2.5
+-    OPTIONS
+-        "BUILD_BOTH_LIBS OFF"
+-        "BUILD_DOCUMENTATION OFF"
+-        "BUILD_MANPAGES OFF"
+-        "PACKAGE_DEBUG_LIBS OFF"
+-        "APPLE_MULTIPLE_ARCHITECTURES OFF"
+-        "INCDIR OFF"
+-        "BINDIR OFF"
+-        "SBINDIR OFF"
+-        "LIBDIR ${CMAKE_INSTALL_LIBDIR}"
+-        "DLLDIR ${CMAKE_INSTALL_BINDIR}"
+-        "MANDIR OFF"
+-        "CMAKEDIR OFF"
+-        "PKGDIR OFF"
+-        "DOCDIR OFF"
+-        "EXAMPLEDIR OFF"
+-    PATCHES geographiclib.patch
+-)
+-
+-target_compile_options(GeographicLib_STATIC PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd9025>)
+-
++find_package(GeographicLib REQUIRED)
+ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE GeographicLib::GeographicLib)
+diff -ruN '--exclude=.git' '--exclude=third_party' a/src/Utilities/Shape/CMakeLists.txt b/src/Utilities/Shape/CMakeLists.txt
+--- a/src/Utilities/Shape/CMakeLists.txt	2025-10-09 02:17:49.000000000 +0300
++++ b/src/Utilities/Shape/CMakeLists.txt	2026-06-21 08:39:18.409140943 +0300
+@@ -14,14 +14,6 @@
+ 
+ #===========================================================================#
+ 
+-CPMAddPackage(
+-    NAME Shapelib
+-    VERSION 1.6.1
+-    GITHUB_REPOSITORY OSGeo/shapelib
+-    OPTIONS
+-        "BUILD_SHAPELIB_CONTRIB OFF"
+-        "BUILD_APPS OFF"
+-        "BUILD_TESTING OFF"
+-)
+-
+-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE shp)
++find_package(PkgConfig REQUIRED)
++pkg_check_modules(SHP REQUIRED IMPORTED_TARGET shapelib)
++target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE PkgConfig::SHP)
