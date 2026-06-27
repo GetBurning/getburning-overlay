@@ -104,6 +104,10 @@ src_prepare() {
 	sed -i 's/\r$//' src/MAVLink/LibEvents/CMakeLists.txt || die
 
 	cmake_src_prepare
+	# Disable Qt6 auto-deploy (QTP0001) which tries to bundle Qt libs
+	# alongside the binary — wrong for system installs.
+	sed -i 's/SET QTP0001 NEW/SET QTP0001 OLD/' CMakeLists.txt || die
+
 
 	# Add system library find_package calls to main CMakeLists.txt
 	# (needed because subdirectory targets aren't visible at parent scope)
@@ -164,4 +168,31 @@ src_configure() {
 		-DQGC_BUILD_TESTING=OFF
 	)
 	cmake_src_configure
+}
+
+src_install() {
+	# Skip Qt6 deploy step which tries to bundle Qt libs (wrong for system install)
+	local BUILD_BIN="${BUILD_DIR}/RelWithDebInfo/QGroundControl"
+	if [[ ! -f "${BUILD_BIN}" ]]; then
+		BUILD_BIN="${BUILD_DIR}/QGroundControl"
+	fi
+
+	exeinto /usr/bin
+	doexe "${BUILD_BIN}"
+
+	# Install QML resources
+	if [[ -d "${BUILD_DIR}/qml" ]]; then
+		insinto /usr/share/${PN}/qml
+		doins -r "${BUILD_DIR}/qml"/*
+	fi
+
+	# Install desktop entry
+	if [[ -f deploy/linux/org.mavlink.qgroundcontrol.desktop ]]; then
+		domenu deploy/linux/org.mavlink.qgroundcontrol.desktop
+	fi
+
+	# Install icon
+	if [[ -f resources/icons/qgroundcontrol.png ]]; then
+		newicon -s 256 resources/icons/qgroundcontrol.png qgroundcontrol.png
+	fi
 }
