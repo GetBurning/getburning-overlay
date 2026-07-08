@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=UVtools
+GenericName=UV Tools
+Comment=MSLA/DLP, file analysis, calibration, repair, conversion and manipulation
+Exec=uvtools
+Icon=uvtools
+Terminal=false
+Type=Application
+Categories=Graphics;
+MimeType=application/x-3mf;application/x-lightburn;application/x-prusa-slicer;application/x-slic3r;application/x-uvg;application/x-uvg2;application/x-uvg3;
