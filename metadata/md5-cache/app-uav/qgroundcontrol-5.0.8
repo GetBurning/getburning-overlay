@@ -1,15 +1,15 @@
-BDEPEND=dev-qt/qttools:6 app-alternatives/ninja >=dev-build/cmake-3.28.5 >=dev-vcs/git-1.8.2.1[curl]
+BDEPEND=dev-qt/qttools:6 app-alternatives/ninja >=dev-build/cmake-3.28.5
 DEFINED_PHASES=compile configure install prepare test unpack
 DEPEND=dev-qt/qtbase:6=[concurrent,gui,network,opengl,sql,widgets,xml] dev-qt/qt5compat:6 dev-qt/qtcharts:6[qml] dev-qt/qtdeclarative:6[opengl,widgets] dev-qt/qtlocation:6 dev-qt/qtmultimedia:6 dev-qt/qtpositioning:6[qml] dev-qt/qtquick3d:6 dev-qt/qtquickcontrols2:6 dev-qt/qtsensors:6[qml] dev-qt/qtserialport:6 dev-qt/qtspeech:6 dev-qt/qtsvg:6 dev-qt/qtwayland:6 dev-qt/qttools:6[linguist] media-libs/gstreamer:1.0 media-libs/gst-plugins-base:1.0 media-libs/gst-plugins-good:1.0 media-plugins/gst-plugins-qt6 alsa? ( media-libs/gst-plugins-base:1.0[alsa] ) pulseaudio? ( media-plugins/gst-plugins-pulse:1.0 ) jack? ( media-plugins/gst-plugins-jack:1.0 ) vaapi? ( media-plugins/gst-plugins-vaapi:1.0 ) media-libs/libsdl2 sci-libs/shapelib sci-geosciences/GeographicLib sys-libs/zlib dev-libs/glib:2
 DESCRIPTION=Ground control station for drones
 EAPI=8
 HOMEPAGE=https://qgroundcontrol.com/
-INHERIT=cmake git-r3 xdg-utils
+INHERIT=cmake xdg-utils
 IUSE=+vaapi alsa pulseaudio jack
 LICENSE=GPL-3
-PROPERTIES=live
 RDEPEND=dev-qt/qtbase:6=[concurrent,gui,network,opengl,sql,widgets,xml] dev-qt/qt5compat:6 dev-qt/qtcharts:6[qml] dev-qt/qtdeclarative:6[opengl,widgets] dev-qt/qtlocation:6 dev-qt/qtmultimedia:6 dev-qt/qtpositioning:6[qml] dev-qt/qtquick3d:6 dev-qt/qtquickcontrols2:6 dev-qt/qtsensors:6[qml] dev-qt/qtserialport:6 dev-qt/qtspeech:6 dev-qt/qtsvg:6 dev-qt/qtwayland:6 dev-qt/qttools:6[linguist] media-libs/gstreamer:1.0 media-libs/gst-plugins-base:1.0 media-libs/gst-plugins-good:1.0 media-plugins/gst-plugins-qt6 alsa? ( media-libs/gst-plugins-base:1.0[alsa] ) pulseaudio? ( media-plugins/gst-plugins-pulse:1.0 ) jack? ( media-plugins/gst-plugins-jack:1.0 ) vaapi? ( media-plugins/gst-plugins-vaapi:1.0 ) media-libs/libsdl2 sci-libs/shapelib sci-geosciences/GeographicLib sys-libs/zlib dev-libs/glib:2
 RESTRICT=mirror
 SLOT=0
-_eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	flag-o-matic	fd3558f73f6503093adee69adf41020d	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	ninja-utils	d063ea1900a793f93eb095010d6d9156	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	cmake	c54f532543a549f7318d6c49aaf8e953	git-r3	2f8cdb10b033f92c3136aa6488a31c98
-_md5_=8aaed67f02686ee3a6ca2a44f05e1c2f
+SRC_URI=https://github.com/mavlink/qgroundcontrol/archive/refs/tags/v5.0.8.tar.gz -> qgroundcontrol-5.0.8.tar.gz https://github.com/ArduPilot/ArduPilot-Parameter-Repository/archive/a458e8e86a8ffa3b7f52f4601adcdaaff0db5f42.tar.gz -> ardupilot-params-5.0.8.tar.gz https://github.com/mavlink/c_library_v2/archive/19f9955598af9a9181064619bd2e3c04bd2d848a.tar.gz -> qgc-mavlink-5.0.8.tar.gz https://github.com/mavlink/libevents/archive/840a88ea226d.tar.gz -> qgc-libevents-5.0.8.tar.gz https://github.com/PX4/ulog_cpp/archive/af366a91cb90.tar.gz -> qgc-ulog-cpp-5.0.8.tar.gz https://github.com/PX4/PX4-GPSDrivers/archive/52bc6ecef4fb.tar.gz -> qgc-px4-gpsdrivers-5.0.8.tar.gz https://github.com/mdqinc/SDL_GameControllerDB/archive/e24bb1ce0fe7.tar.gz -> qgc-sdl-gamecontrollerdb-5.0.8.tar.gz https://github.com/tukaani-project/xz-embedded/archive/refs/tags/v2024-12-30.tar.gz -> qgc-xz-embedded-5.0.8.tar.gz https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.24.13.tar.xz
+_eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	flag-o-matic	fd3558f73f6503093adee69adf41020d	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	ninja-utils	d063ea1900a793f93eb095010d6d9156	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	cmake	c54f532543a549f7318d6c49aaf8e953
+_md5_=9b10ac0b913a3c5c32cffe6387d30120
