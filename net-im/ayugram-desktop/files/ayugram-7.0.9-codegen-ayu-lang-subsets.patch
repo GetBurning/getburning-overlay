@@ -1,0 +1,32 @@
+Fix codegen lang subset scanner to also detect ayu_-prefixed keys
+
+AyuGram uses custom translation keys with the "ayu_" prefix (e.g.
+tr::ayu_JoinDateChat) in addition to upstream's "lng_" prefix. The new
+upstream codegen subset scanner only detects "lng_" prefixed tokens,
+causing ayu_ keys to be missing from the generated per-file subset
+headers.
+
+--- a/Telegram/codegen/codegen/lang/subsets.cpp	2026-08-10 09:17:46.970773509 +0300
++++ b/Telegram/codegen/codegen/lang/subsets.cpp	2026-08-10 17:55:33.760943956 +0300
+@@ -207,6 +207,21 @@
+ 		result.tokens.push_back(content.mid(i, till - i));
+ 		i = till - 1;
+ 	}
++	for (auto i = qsizetype(0); i + 4 < size; ++i) {
++		if (data[i] != 'a'
++			|| data[i + 1] != 'y'
++			|| data[i + 2] != 'u'
++			|| data[i + 3] != '_'
++			|| (i > 0 && IsIdentifierChar(data[i - 1]))) {
++			continue;
++		}
++		auto till = i + 4;
++		while (till != size && IsIdentifierChar(data[till])) {
++			++till;
++		}
++		result.tokens.push_back(content.mid(i, till - i));
++		i = till - 1;
++	}
+ 	for (auto from = qsizetype(0); from != size;) {
+ 		const auto found = content.indexOf(kPhraseUsage, from);
+ 		if (found < 0) {
